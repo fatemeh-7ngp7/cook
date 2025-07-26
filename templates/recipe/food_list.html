@@ -1,0 +1,530 @@
+<!-- recipes/templates/recipe/food_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}دستور پخت غذاها - آشپزخانه من{% endblock %}
+
+{% block meta_description %}مجموعه کاملی از دستور پخت غذاهای خوشمزه و سالم با طرز تهیه آسان{% endblock %}
+
+{% block extra_head %}
+<style>
+.filter-section {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.filter-controls {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: var(--spacing-lg);
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.filter-label {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.search-input {
+    padding-right: 3rem;
+}
+
+.category-tabs {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
+}
+
+.category-tab {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-full);
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+    border: 1px solid var(--border-light);
+}
+
+.category-tab:hover {
+    background-color: var(--primary-light);
+    color: var(--white);
+    border-color: var(--primary-light);
+}
+
+.category-tab.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.recipe-card-modern {
+    position: relative;
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    height: 100%;
+}
+
+.recipe-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.recipe-image-container {
+    position: relative;
+    height: 240px;
+    overflow: hidden;
+}
+
+.recipe-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+}
+
+.recipe-card-modern:hover .recipe-image {
+    transform: scale(1.1);
+}
+
+.recipe-badge {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    box-shadow: var(--shadow-md);
+}
+
+.recipe-content {
+    padding: var(--spacing-xl);
+}
+
+.recipe-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    line-height: var(--line-height-tight);
+}
+
+.recipe-description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--spacing-lg);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.recipe-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.recipe-meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.recipe-meta-item i {
+    color: var(--primary-color);
+    font-size: var(--font-size-base);
+}
+
+.recipe-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.recipe-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--primary-color);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.recipe-link:hover {
+    color: var(--primary-light);
+    transform: translateX(-2px);
+}
+
+.recipe-likes {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.recipe-likes i {
+    color: var(--accent-color);
+}
+
+.results-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+}
+
+.results-count {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.clear-filters {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.clear-filters.show {
+    display: flex;
+}
+
+.no-results {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    color: var(--text-secondary);
+}
+
+.no-results i {
+    font-size: 4rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-lg);
+}
+
+.no-results h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.no-results p {
+    margin-bottom: var(--spacing-xl);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-3xl);
+}
+
+@media (max-width: 768px) {
+    .filter-controls {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .category-tabs {
+        gap: var(--spacing-xs);
+    }
+
+    .category-tab {
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+
+    .recipe-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .recipe-content {
+        padding: var(--spacing-lg);
+    }
+
+    .results-info {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- عنوان صفحه -->
+    <div class="page-header text-center mb-4">
+        <h1 class="gradient-text">دستور پخت غذاها</h1>
+        <p class="lead">مجموعه‌ای کامل از دستور پخت‌های خوشمزه و سالم</p>
+    </div>
+
+    <!-- فیلترها و جستجو -->
+    <div class="filter-section">
+        <form method="GET" id="filterForm">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label class="filter-label">جستجو در دستور پخت‌ها</label>
+                    <div class="search-input-wrapper">
+                        <input type="text"
+                               name="search"
+                               value="{{ search_query }}"
+                               class="form-control search-input"
+                               placeholder="نام غذا، مواد اولیه یا توضیحات...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">دسته‌بندی</label>
+                    <select name="category" class="form-control">
+                        <option value="all" {% if current_category == 'all' %}selected{% endif %}>همه دسته‌ها</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}"
+                                {% if current_category == category.name %}selected{% endif %}>
+                            {{ category.display_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">مرتب‌سازی</label>
+                    <select name="sort" class="form-control">
+                        <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>جدیدترین</option>
+                        <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>قدیمی‌ترین</option>
+                        <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>محبوب‌ترین</option>
+                        <option value="time_asc" {% if current_sort == 'time_asc' %}selected{% endif %}>کمترین زمان</option>
+                        <option value="time_desc" {% if current_sort == 'time_desc' %}selected{% endif %}>بیشترین زمان</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i>
+                    اعمال فیلتر
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- دسته‌بندی‌های سریع -->
+    <div class="category-tabs">
+        <a href="?category=all&search={{ search_query }}&sort={{ current_sort }}"
+           class="category-tab {% if current_category == 'all' %}active{% endif %}">
+            همه
+        </a>
+        {% for category in categories %}
+        <a href="?category={{ category.name }}&search={{ search_query }}&sort={{ current_sort }}"
+           class="category-tab {% if current_category == category.name %}active{% endif %}">
+            {{ category.display_name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- اطلاعات نتایج -->
+    <div class="results-info">
+        <div class="results-count">
+            <i class="fas fa-utensils"></i>
+            {{ recipes.paginator.count }} دستور پخت پیدا شد
+        </div>
+
+        <a href="{% url 'food_list' %}"
+           class="clear-filters {% if search_query or current_category != 'all' or current_sort != 'newest' %}show{% endif %}">
+            <i class="fas fa-times"></i>
+            پاک کردن فیلترها
+        </a>
+    </div>
+
+    <!-- لیست دستور پخت‌ها -->
+    {% if recipes %}
+    <div class="recipe-grid">
+        {% for recipe in recipes %}
+        <div class="recipe-card-modern card hover-lift">
+            <div class="recipe-image-container">
+                {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
+                {% else %}
+                <img src="{% static 'images/default-recipe.jpg' %}" alt="{{ recipe.title }}" class="recipe-image">
+                {% endif %}
+
+                <div class="recipe-badge">
+                    {{ recipe.category.display_name }}
+                </div>
+            </div>
+
+            <div class="recipe-content">
+                <h3 class="recipe-title">{{ recipe.title }}</h3>
+
+                <p class="recipe-description">{{ recipe.description }}</p>
+
+                <div class="recipe-meta-row">
+                    <div class="recipe-meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ recipe.prep_time|add:recipe.cook_time }} دقیقه</span>
+                    </div>
+
+                    <div class="recipe-meta-item">
+                        <i class="fas fa-users"></i>
+                        <span>{{ recipe.servings }} نفر</span>
+                    </div>
+
+                    <div class="recipe-meta-item">
+                        <i class="fas fa-signal"></i>
+                        <span>{{ recipe.get_difficulty_display }}</span>
+                    </div>
+                </div>
+
+                <div class="recipe-footer">
+                    <a href="{% url 'food_recipe' recipe.slug %}" class="recipe-link">
+                        مشاهده دستور پخت
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+
+                    <div class="recipe-likes">
+                        <i class="fas fa-heart"></i>
+                        <span>{{ recipe.likes_count|default:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- صفحه‌بندی -->
+    {% if recipes.has_other_pages %}
+    <div class="pagination-wrapper">
+        <div class="pagination">
+            {% if recipes.has_previous %}
+            <a href="?page={{ recipes.previous_page_number }}&category={{ current_category }}&search={{ search_query }}&sort={{ current_sort }}"
+               class="pagination-link">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+
+            {% for num in recipes.paginator.page_range %}
+                {% if recipes.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > recipes.number|add:'-3' and num < recipes.number|add:'3' %}
+                    <a href="?page={{ num }}&category={{ current_category }}&search={{ search_query }}&sort={{ current_sort }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if recipes.has_next %}
+            <a href="?page={{ recipes.next_page_number }}&category={{ current_category }}&search={{ search_query }}&sort={{ current_sort }}"
+               class="pagination-link">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- نتیجه‌ای یافت نشد -->
+    <div class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>نتیجه‌ای یافت نشد</h3>
+        <p>متأسفانه دستور پخت مورد نظر شما پیدا نشد. لطفاً کلمات جستجو یا فیلترها را تغییر دهید.</p>
+        <a href="{% url 'food_list' %}" class="btn btn-primary">
+            <i class="fas fa-undo"></i>
+            مشاهده تمام دستور پخت‌ها
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = filterForm.querySelector('input[name="search"]');
+    const categorySelect = filterForm.querySelector('select[name="category"]');
+    const sortSelect = filterForm.querySelector('select[name="sort"]');
+
+    // Auto-submit form when filters change
+    [categorySelect, sortSelect].forEach(element => {
+        element.addEventListener('change', () => {
+            filterForm.submit();
+        });
+    });
+
+    // Submit form on Enter key in search input
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            filterForm.submit();
+        }
+    });
+
+    // Animate recipe cards on scroll
+    const observeCards = () => {
+        const cards = document.querySelectorAll('.recipe-card-modern');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        cards.forEach(card => observer.observe(card));
+    };
+
+    // Initialize animations
+    observeCards();
+
+    // Show toast for no results
+    {% if not recipes and search_query %}
+    setTimeout(() => {
+        showToast('نتیجه‌ای برای "{{ search_query }}" یافت نشد', 'info');
+    }, 500);
+    {% endif %}
+});
+</script>
+{% endblock %}

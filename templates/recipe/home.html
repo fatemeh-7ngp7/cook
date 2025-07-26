@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_description %}آشپزخانه من - بهترین دستور پخت غذاهای سالم و خوشمزه. یاد بگیرید چگونه غذاهای مفید و مغذی درست کنید{% endblock %}
+
+{% block content %}
+<!-- Hero Banner Section -->
+<section class="hero-banner">
+    <div class="banner-container">
+        <div class="banner-content">
+            <div class="banner-overlay"></div>
+            <img src="{% static 'images/banner-cooking.jpg' %}" alt="آشپزی سالم" class="banner-image">
+            <div class="banner-text">
+                <h1 class="banner-title">به آشپزخانه من خوش آمدید</h1>
+                <p class="banner-subtitle">
+                    غذاهای سالم و مغذی بخورید، زندگی بهتری داشته باشید
+                    <br>
+                    بهترین دستور پخت‌های خانگی را با ما یاد بگیرید
+                </p>
+                <div class="banner-actions">
+                    <a href="{% url 'food_list' %}" class="btn btn-primary">
+                        <i class="fas fa-book-open"></i>
+                        مشاهده دستور پخت‌ها
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">چرا آشپزخانه من؟</h2>
+            <p class="section-subtitle">مزایایی که ما به شما ارائه می‌دهیم</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3 class="feature-title">غذاهای سالم</h3>
+                <p class="feature-description">تمام دستور پخت‌های ما با تمرکز بر سلامت و تغذیه مناسب تهیه شده‌اند</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="feature-title">سریع و آسان</h3>
+                <p class="feature-description">دستور پخت‌های ساده و سریع که در کمترین زمان بهترین نتیجه را می‌دهند</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="feature-title">طعم عالی</h3>
+                <p class="feature-description">غذاهایی خوشمزه که تمام اعضای خانواده آن‌ها را دوست خواهند داشت</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3 class="feature-title">کالری مشخص</h3>
+                <p class="feature-description">اطلاعات کامل کالری و مواد مغذی هر غذا برای کنترل بهتر رژیم غذایی</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Recipes Section -->
+{% if featured_recipes %}
+<section class="featured-recipes">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">دستور پخت‌های محبوب</h2>
+            <p class="section-subtitle">پرطرفدارترین غذاهای سایت ما</p>
+        </div>
+        <div class="recipes-grid">
+            {% for recipe in featured_recipes %}
+            <article class="recipe-card">
+                <div class="recipe-image-container">
+                    <a href="{% url 'recipe:food_recipe' recipe.pk %}">
+                        <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="recipe-image" loading="lazy">
+                    </a>
+                    <div class="recipe-meta">
+                        <span class="cook-time">
+                            <i class="fas fa-clock"></i>
+                            {{ recipe.cook_time }} دقیقه
+                        </span>
+                        <span class="servings">
+                            <i class="fas fa-users"></i>
+                            {{ recipe.servings }} نفره
+                        </span>
+                    </div>
+                </div>
+                <div class="recipe-content">
+                    <h3 class="recipe-title">
+                        <a href="{% url 'recipe:food_recipe' recipe.pk %}">{{ recipe.name }}</a>
+                    </h3>
+                    <div class="recipe-info">
+                        <span class="calories">
+                            <i class="fas fa-fire"></i>
+                            {{ recipe.calories }} کالری
+                        </span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="section-footer">
+            <a href="{% url 'recipe:food_list' %}" class="btn btn-outline">
+                مشاهده تمام دستور پخت‌ها
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <div class="cta-text">
+                <h2 class="cta-title">آماده شروع آشپزی هستید؟</h2>
+                <p class="cta-description">
+                    با مجموعه کامل دستور پخت‌های ما، هر روز غذای جدید و خوشمزه‌ای درست کنید
+                </p>
+            </div>
+            <div class="cta-actions">
+                <a href="{% url 'food_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-utensils"></i>
+                    شروع آشپزی
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
